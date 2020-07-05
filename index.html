@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="apple-mobile-web-app-title" content="Speaker Time">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Speaker Time!</title>
+  <style>
+    html, body {
+      font-size: 3vw;
+      font-family: "Open Sans";
+      background: #EEE;
+    }
+
+    h2 {
+      margin:.1vw;
+    }
+
+    a {
+      text-decoration: none;
+      color: #999;
+    }
+
+    audio {
+      display: block;
+    }
+
+    .control-panel {
+      margin:.2vw;
+    }
+
+    div.controls {
+      display: inline-block;
+    }
+
+    div.controls label {
+      display: inline-block;
+      text-align: right;
+      width: 8vw;
+    }
+
+    div.controls label, div.controls input {
+      vertical-align: middle;
+      padding: 0;
+      margin: 0;
+      font-size: 2vw;
+    }
+
+    div.controls input {
+      padding: 1vw;
+      margin: 1vw;
+    }
+
+    div.speakers{
+      position: relative;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: flex-end;
+      width: 100%;
+      height: 100%;
+      margin-top: 50px;
+    }
+
+    .circle{
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      border: 3px solid white;
+      border-right: 3px solid blue;
+      margin: 50px;
+    }
+
+    .flex-center{
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .speaker-box{
+      flex-direction: column;
+      margin-right: 1vw;
+      margin-bottom: 1vw;
+      width: 200px;
+      padding: 40px 0 60px 0;
+      border-radius: 10px;
+      border: 5px solid #000;
+      background-color: #2c2c2c;
+    }
+
+    .speaker{
+      border-radius: 50%;
+      border: 5px solid #000;
+      background-color: #b4b4b4;
+    }
+    .speaker.woofer{
+      width: 150px;
+      height: 150px;
+      animation: tweeder 1s infinite ease;
+    }
+    .speaker.mid{
+      width: 75px;
+      height: 75px;
+      animation: tweeder 1s infinite ease;
+    }
+    .speaker.tweeter{
+      width: 25px;
+      height: 25px;
+      animation: tweeder 1s infinite ease;
+    }
+
+    .ring{
+      background-color: #b4b4b4;
+      border-radius: 50%;
+      border: 5px solid #000;
+    }
+    .ring.woofer{
+      width: 125px;
+      height: 125px;
+    }
+    .ring.mid{
+      width: 50px;
+      height: 50px;
+    }
+    .ring.tweeter{
+      width: 10px;
+      height: 10px;
+    }
+
+    .interior{
+      border-radius: 50%;
+      background-color: #000;
+    }
+    .interior.woofer{
+      width: 26px;
+      height: 26px;
+    }
+    .interior.mid{
+        width: 18px;
+        height: 18px;
+    }
+    .interior.tweeter{
+        width: 9px;
+        height: 9px;
+    }
+
+    .vent{
+      margin-bottom: 40px;
+      width: 100px;
+      height: 20px;
+      border-radius: 10px;
+      border: 5px solid #000;
+      background-color: darken(#2c2c2c, 5%);
+    }
+
+    .spacer{
+      width: 100px;
+      height: 50px;
+    }
+
+    @keyframes spin{
+      0%{ transform: rotate(0deg) }
+      100%{ transform: rotate(360deg)}
+    }
+
+    @keyframes elastic{
+      0%{ transform: scale(1.1) }
+      15%{ transform: scale(1.7) }
+      35%{ transform: scale(1.3) }
+      70%{ transform: scale(1.5) }
+      90%{ transform: scale(1.1) }
+      100%{ transform: scale(1) }
+    }
+
+    @keyframes tweeder{
+      0%{ transform: scale(1.1) }
+      15%{ transform: scale(1.15) }
+      35%{ transform: scale(1.1)}
+      70%{ transform: scale(1.15) }
+      90%{ transform: scale(1.1) }
+      100%{ transform: scale(1.1) }
+    }
+  </style>
+</head>
+
+<h2>Speaker Time!</h2>
+
+<div class="control-panel">
+  <div class="controls">
+    <label>Speaker</label>
+    <input type="button" value="+" onclick="addComponent('speaker');"></input>
+    <input type="button" value="-" onclick="removeComponent('speaker');"></input>
+  </div>
+  <div class="controls">
+    <label>Tweeter</label>
+    <input type="button" value="+" onclick="addComponent('tweeter');"></input>
+    <input type="button" value="-" onclick="removeComponent('tweeter');"></input>
+  </div>
+  <div class="controls">
+    <label>Mid</label>
+    <input type="button" value="+" onclick="addComponent('mid');"></input>
+    <input type="button" value="-" onclick="removeComponent('mid');"></input>
+  </div>
+  <div class="controls">
+    <label>Woofer</label>
+    <input type="button" value="+" onclick="addComponent('woofer');"></input>
+    <input type="button" value="-" onclick="removeComponent('woofer');"></input>
+  </div>
+</div>
+
+<div id="speakers" class="speakers">
+  <div class="speaker-box flex-center">
+    <div class="vent"></div>
+    <div class="speaker tweeter flex-center">
+      <div class="ring tweeter flex-center">
+        <div class="interior tweeter"></div>
+      </div>
+    </div>
+    <div class="speaker mid flex-center">
+      <div class="ring mid flex-center">
+        <div class="interior mid"></div>
+      </div>
+    </div>
+    <div class="speaker flex-center circle2">
+      <div class="ring flex-center">
+        <div class="interior"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<audio id="player" controls crossorigin="anonymous">
+  <source src="https://speaker-time-media.s3-us-west-2.amazonaws.com/hiphop1.mp3" type="audio/mpeg">
+  Your browser does not support the audio tag.
+</audio>
+
+<script>
+  var started = false;
+  var context = new AudioContext();
+  var mediaElement = document.getElementById('player');
+  var sourceNode = context.createMediaElementSource(mediaElement);
+
+  mediaElement.addEventListener('ended', () => {
+    mediaElement.play();
+  }, false);
+
+  // EQ Properties
+  //
+  var gainDb = -40.0;
+  var bandSplit = [360, 3600];
+
+  var hBand = context.createBiquadFilter();
+  hBand.type = 'lowshelf';
+  hBand.frequency.value = bandSplit[0];
+  hBand.gain.value = gainDb;
+
+  var hInvert = context.createGain();
+  hInvert.gain.value = -1.0;
+
+  var mBand = context.createGain();
+
+  var lBand = context.createBiquadFilter();
+  lBand.type = 'highshelf';
+  lBand.frequency.value = bandSplit[1];
+  lBand.gain.value = gainDb;
+
+  var lInvert = context.createGain();
+  lInvert.gain.value = -1.0;
+
+  sourceNode.connect(lBand);
+  sourceNode.connect(mBand);
+  sourceNode.connect(hBand);
+
+  hBand.connect(hInvert);
+  lBand.connect(lInvert);
+
+  hInvert.connect(mBand);
+  lInvert.connect(mBand);
+
+  var lGain = context.createGain();
+  var mGain = context.createGain();
+  var hGain = context.createGain();
+
+  lBand.connect(lGain);
+  mBand.connect(mGain);
+  hBand.connect(hGain);
+
+  lGain.gain.value = 0;
+  mGain.gain.value = 0;
+  hGain.gain.value = 0;
+
+  var sum = context.createGain();
+  lGain.connect(sum);
+  mGain.connect(sum);
+  hGain.connect(sum);
+  sum.connect(context.destination);
+
+  var components = ['speaker'];
+
+  function renderSpeakers() {
+    container = document.getElementById('speakers');
+    while (container.firstChild) {
+      container.firstChild.remove();
+    }
+
+    var currentSpeaker;
+    var needSpacer = false;
+    components.forEach(elem => {
+      switch (elem) {
+        case 'speaker':
+          currentSpeaker = document.createElement('div');
+          currentSpeaker.className = 'speaker-box flex-center';
+          currentSpeaker.innerHTML = '<div class="vent"></div>';
+          container.appendChild(currentSpeaker);
+          needSpacer = false;
+          break;
+        case 'woofer':
+        case 'mid':
+        case 'tweeter':
+          if (needSpacer) {
+            var spacer = document.createElement('div');
+            spacer.className = 'spacer';
+            currentSpeaker.appendChild(spacer);
+          }
+          currentSpeaker.appendChild(renderSpeaker(elem));
+          needSpacer = true;
+          break;
+      }
+    });
+  }
+
+  function renderSpeaker(type) {
+    var speaker = document.createElement('div');
+    speaker.className = 'speaker ' + type + ' flex-center';
+
+    var ring = document.createElement('div');
+    ring.className = 'ring ' + type + ' flex-center';
+
+    var interior = document.createElement('div');
+    interior.className = 'interior ' + type;
+
+    ring.appendChild(interior);
+    speaker.appendChild(ring);
+
+    return speaker;
+  }
+
+  function renderGain() {
+    var wooferGain = midGain = tweeterGain = 0.0;
+    components.forEach(elem => {
+      switch (elem) {
+        case 'woofer':
+          wooferGain += 0.1;
+          break;
+        case 'mid':
+          midGain += 0.1;
+          break;
+        case 'tweeter':
+          tweeterGain += 0.1;
+          break;
+      }
+    });
+
+    setGain(lGain, wooferGain);
+    setGain(mGain, midGain);
+    setGain(hGain, tweeterGain);
+  }
+
+  function renderComponents() {
+    renderSpeakers();
+    renderGain();
+  }
+
+  function addComponent(type) {
+    if (context.state === 'suspended') {
+        context.resume();
+    }
+    if (!started) {
+      mediaElement.play();
+      started = true;
+    }
+    components.push(type);
+    renderComponents();
+  }
+
+  function removeComponent(type) {
+    var temp = [];
+    // don't allow removal of 1st item (speaker)
+    while(components.length > 1) {
+      comp = components.pop();
+      if (comp == type) {
+        break;
+      }
+      temp.push(comp);
+    }
+
+    temp.reduceRight((_, elem) => components.push(elem), null);
+
+    renderComponents();
+  }
+
+  function setGain(gain, value) {
+    if (value > 2) {
+      value = 2;
+    } else if (value < 0) {
+      value = 0;
+    }
+    gain.gain.value = value;
+  }
+
+  renderComponents();
+
+  // CSS speaker animations from: https://codepen.io/nebbigit/pen/NWWXarX
+  // Web Audio EQ from: https://codepen.io/andremichelle/pen/RNwamZ
+</script>
