@@ -26,7 +26,8 @@
     }
 
     .control-panel {
-      margin:.2vw;
+      margin: .2vw;
+      display: none;
     }
 
     div.controls {
@@ -185,7 +186,23 @@
 
 <h2>Speaker Time!</h2>
 
-<div class="control-panel">
+<div id="shared-panel" class="control-panel">
+  <div id="shared-message" class="message"></div>
+  <div class="controls">
+    <input type="button" value="Play" onclick="play();"></input>
+  </div>
+  <div class="controls">
+    <input type="button" value="Stop" onclick="stop();"></input>
+  </div>
+  <div class="controls">
+    <input type="button" value="Edit" onclick="edit();"></input>
+  </div>
+  <div class="controls">
+    <input type="button" value="New" onclick="reset();"></input>
+  </div>
+</div>
+
+<div id="edit-panel" class="control-panel">
   <div class="controls">
     <label>Tweeter</label>
     <input type="button" value="+" onclick="addComponent('tweeter');"></input>
@@ -205,6 +222,17 @@
     <label>Speaker</label>
     <input type="button" value="+" onclick="addComponent('speaker');"></input>
     <input type="button" value="-" onclick="removeComponent('speaker');"></input>
+  </div>
+  <div class="controls">
+    <input type="button" value="Share" onclick="toggleShare();"></input>
+  </div>
+</div>
+
+<div id="sharing-panel" class="control-panel">
+  <div class="controls">
+    <label>Message</label>
+    <input id="sharing-text" type="text"></input>
+    <input type="button" value="Copy URL" onclick="copyUrl();"></input>
   </div>
 </div>
 
@@ -378,7 +406,7 @@
     renderGain();
   }
 
-  function addComponent(type) {
+  function play() {
     if (context.state === 'suspended') {
         context.resume();
     }
@@ -386,11 +414,63 @@
       mediaElement.play();
       started = true;
     }
+  }
+
+  function stop() {
+    mediaElement.pause();
+    started = false;
+  }
+
+  function edit() {
+    play();
+
+    document.getElementById('edit-panel').style.display = 'block';
+    document.getElementById('shared-panel').style.display = 'none';
+  }
+
+  function reset() {
+    document.getElementById('edit-panel').style.display = 'block';
+    document.getElementById('shared-panel').style.display = 'none';
+    components = ['speaker'];
+    renderComponents();
+  }
+
+  function toggleShare() {
+    var sharingPanel = document.getElementById('sharing-panel');
+    if (sharingPanel.style.display != 'block') {
+      sharingPanel.style.display = 'block';
+    } else {
+      sharingPanel.style.display = 'none';
+    }
+  }
+
+  function copyUrl() {
+    var url = new URL(window.location.href);
+    url.searchParams.set('components', encodeComponents(components));
+    url.searchParams.set('msg', document.getElementById('sharing-text').value);
+
+    var tempInput = document.createElement("input");
+    tempInput.type = "text";
+    tempInput.value = url.toString();
+
+    var sharingPanel = document.getElementById('sharing-panel');
+    sharingPanel.appendChild(tempInput);
+    tempInput.select();
+    document.execCommand("copy");
+
+    sharingPanel.removeChild(tempInput);
+  }
+
+  function addComponent(type) {
+    play();
+
     components.push(type);
     renderComponents();
   }
 
   function removeComponent(type) {
+    play();
+
     var temp = [];
     // don't allow removal of 1st item (speaker)
     while(components.length > 1) {
@@ -413,6 +493,52 @@
       value = 0;
     }
     gain.gain.value = value;
+  }
+
+  var encoder = new Map([
+    ['speaker', 's'],
+    ['woofer', 'w'],
+    ['mid', 'm'],
+    ['tweeter', 't']
+  ]);
+
+  var decoder = new Map();
+  encoder.forEach((val, key) => {
+    decoder.set(val, key);
+  }, new Map());
+
+  function encodeComponents(comps) {
+    var encoded = ''
+    for (let i = 1; i < comps.length; i++) {
+      encoded += encoder.get(comps[i]);
+    }
+    return encoded;
+  }
+
+  function decodeComponents(encoded) {
+    var comps = ['speaker']
+    if (!encoded) {
+      return comps;
+    }
+    for (let code of encoded) {
+      if (decoder.has(code)) {
+        comps.push(decoder.get(code));
+      }
+    }
+    return comps;
+  }
+
+  let url = new URL(window.location.href);
+  let compsParam = url.searchParams.get("components");
+  if (compsParam) {
+    components = decodeComponents(compsParam);
+    let msgParam = url.searchParams.get("msg");
+    if (msgParam) {
+      document.getElementById("shared-message").innerText = msgParam;
+    }
+    document.getElementById('shared-panel').style.display = 'block';
+  } else {
+    document.getElementById('edit-panel').style.display = 'block';
   }
 
   renderComponents();
